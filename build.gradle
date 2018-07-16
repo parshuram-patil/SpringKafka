@@ -1,0 +1,38 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'war'
+apply from: 'gradle.plugin'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+gretty {
+    httpPort = 8091
+    contextPath = '/MySpringKafka'
+    servletContainer = 'jetty9'
+    debugPort = 9797
+    debugSuspend = false
+    inplaceMode="hard"
+}
+
+dependencies {
+	compile "org.springframework:spring-webmvc:${springFrameworkVersion}"
+	
+	compile "com.fasterxml.jackson.core:jackson-core:2.7.3"
+	compile "com.fasterxml.jackson.core:jackson-databind:2.7.3"
+	
+	compile "org.springframework.kafka:spring-kafka:1.1.2.RELEASE"
+	compile group: 'org.apache.kafka', name: 'kafka-clients', version: '0.10.1.1'
+	compile group:'org.apache.kafka', name: 'kafka_2.11', version: '0.10.1.1'
+}
+
+war{
+	archiveName= warName + '-' + project.version.toString() + '.war'
+}
