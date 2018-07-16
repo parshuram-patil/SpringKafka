@@ -21,12 +21,8 @@ public class KafkaProducerInteractor {
     String messageInfo = null;
     
     try {
-      System.out.println("************** Data Size : " + messageModel.getKey()
-          .getBytes().length
-          + messageModel.getValue()
-              .getBytes().length);
-      kafkaTemplate.send(topic, messageModel.getKey(), messageModel.getValue())
-          .get();
+      System.out.println("************** Data Size : " + messageModel.getKey().getBytes().length + messageModel.getValue().getBytes().length);
+      kafkaTemplate.send(topic, messageModel.getKey(), messageModel.getValue()).get();
       messageInfo = "Message Sent Successfully";
     }
     catch (Exception e) {
