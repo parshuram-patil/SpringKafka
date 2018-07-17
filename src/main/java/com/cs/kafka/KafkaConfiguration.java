@@ -1,19 +1,3 @@
-/*
- * Copyright 2016 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package com.cs.kafka;
 
 import java.util.HashMap;
@@ -116,6 +100,12 @@ public class KafkaConfiguration {
   }
   
   @Bean
+  public ConsumerFactory<String, String> rawConsumerFactory()
+  {
+    return new DefaultKafkaConsumerFactory<>(rawConsumerProperties());
+  }
+  
+  @Bean
   public Map<String, Object> consumerProperties()
   {
     Map<String, Object> props = new HashMap<>();
@@ -135,19 +125,19 @@ public class KafkaConfiguration {
   
   @Bean
   public Map<String, Object> rawConsumerProperties() {
-  	Map<String, Object> props = new HashMap<>();
-  	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-  	props.put(ConsumerConfig.GROUP_ID_CONFIG, rawGroupID);
-  	props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-  	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-  	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-  	props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
-  	props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
-  	props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-  	props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalMs);
-  	props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+    Map<String, Object> props = new HashMap<>();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, rawGroupID);
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
+    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalMs);
+    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
   
-  	return props;
+    return props;
   }
   
   @Bean
@@ -184,14 +174,14 @@ public class KafkaConfiguration {
   
   @Bean
   public ConcurrentMessageListenerContainer<String, String> container(
-  		ConsumerFactory<String, String> rawConsumerProperties) {
-  	ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
-  	containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
-  	containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
-  	ConcurrentMessageListenerContainer<String, String> container = new ConcurrentMessageListenerContainer<>(rawConsumerProperties, containerProperties);
-  	container.setConcurrency(concurrency);
-  	container.start();
-  	return container;
+     ConsumerFactory<String, String> rawConsumerFactory) {
+     ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
+     containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
+     containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
+     ConcurrentMessageListenerContainer<String, String> container = new ConcurrentMessageListenerContainer<>(rawConsumerFactory, containerProperties);
+     container.setConcurrency(concurrency);
+     //container.start();
+     return container;
   }
   
  /* @Bean
