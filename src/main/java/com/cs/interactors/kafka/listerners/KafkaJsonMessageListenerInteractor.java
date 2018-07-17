@@ -1,4 +1,4 @@
-package com.cs.interactors.kafka;
+package com.cs.interactors.kafka.listerners;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.listener.AcknowledgingMessageListener;
@@ -11,7 +11,7 @@ public class KafkaJsonMessageListenerInteractor implements AcknowledgingMessageL
   @Override
   public void onMessage(ConsumerRecord<String, KafkaMessageModel> data, Acknowledgment acknowledgment)
   {
-    System.out.println("*********** Json onMessage() ---> " + data.value().getKey() + "::" + data.value().getValue() + " ===> " + acknowledgment.getClass());
+    System.out.println("*********** In Json onMessage() Message Recieved ---> " + data.value().getKey() + "::" + data.value().getValue() + " ***********");
     acknowledgment.acknowledge();
   }
   

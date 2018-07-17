@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.cs.interactors.kafka.KafkaJsonProducerInteractor;
+import com.cs.interactors.kafka.producer.KafkaJsonProducerInteractor;
 import com.cs.model.kafka.KafkaMessageModel;
 
 @Controller

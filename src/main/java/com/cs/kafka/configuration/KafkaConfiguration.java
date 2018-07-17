@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.cs.kafka;
+package com.cs.kafka.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +41,8 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.cs.interactors.kafka.KafkaJsonMessageListenerInteractor;
-import com.cs.interactors.kafka.KafkaMessageListenerInteractor;
+import com.cs.interactors.kafka.listerners.KafkaJsonMessageListenerInteractor;
+import com.cs.interactors.kafka.listerners.KafkaMessageListenerInteractor;
 import com.cs.model.kafka.KafkaMessageModel;
 
 @EnableKafka

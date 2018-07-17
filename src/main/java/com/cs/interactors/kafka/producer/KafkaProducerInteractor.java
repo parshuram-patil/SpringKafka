@@ -1,4 +1,4 @@
-package com.cs.interactors.kafka;
+package com.cs.interactors.kafka.producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class KafkaProducerInteractor {
     }
     
     try {
-      System.out.println("************** Data Size : " + messageModel.getKey().getBytes().length + messageModel.getValue().getBytes().length);
+      System.out.println("************** Message Sent : " + messageModel.getKey() + "::" + messageModel.getValue());
       kafkaTemplate.send(topic, messageModel.getKey(), messageModel.getValue()).get();
       messageInfo = "Message Sent Successfully";
     }

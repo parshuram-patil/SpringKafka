@@ -1,4 +1,4 @@
-package com.cs.interactors.kafka;
+package com.cs.interactors.kafka.producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
