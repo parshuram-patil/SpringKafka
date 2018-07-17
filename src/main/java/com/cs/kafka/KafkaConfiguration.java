@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.cs.kafka;
 
 import java.util.HashMap;
@@ -18,7 +34,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.listener.config.ContainerProperties;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -172,34 +188,35 @@ public class KafkaConfiguration {
     return tpte;
   }
   
-  @Bean
+  /*@Bean
   public ConcurrentMessageListenerContainer<String, String> container(
-     ConsumerFactory<String, String> rawConsumerFactory) {
-     ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
-     containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
-     containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
-     ConcurrentMessageListenerContainer<String, String> container = new ConcurrentMessageListenerContainer<>(rawConsumerFactory, containerProperties);
-     container.setConcurrency(concurrency);
-     //container.start();
-     return container;
-  }
-  
- /* @Bean
-  public KafkaMessageListenerContainer<String, String> container(
-  		ConsumerFactory<String, String> rawConsumerProperties) {
-  	ContainerProperties containerProperties = new ContainerProperties(new String[] { rawGroupID });
-  	containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
-  	return new KafkaMessageListenerContainer<>(rawConsumerProperties, containerProperties);
+      ConsumerFactory<String, String> rawConsumerFactory) {
+      ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
+      containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
+      containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
+      ConcurrentMessageListenerContainer<String, String> container = new ConcurrentMessageListenerContainer<>(rawConsumerFactory, containerProperties);
+      container.setConcurrency(concurrency);
+      //container.start();
+      return container;
   }*/
+  
+  @Bean
+  public KafkaMessageListenerContainer<String, String> container(
+      ConsumerFactory<String, String> rawConsumerFactory) {
+    ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
+    containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
+    containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
+    return new KafkaMessageListenerContainer<>(rawConsumerFactory, containerProperties);
+  }
   
   /*@Component
   public static class Listener implements AcknowledgingMessageListener<String, String> {
   
-  	@Override
-  	public void onMessage(ConsumerRecord<String, String> data, Acknowledgment acknowledgment) {
-  		System.out.println("\n\n*******************  onMessage() ---> " + data.value());
-  		acknowledgment.acknowledge();
-  	}
+    @Override
+    public void onMessage(ConsumerRecord<String, String> data, Acknowledgment acknowledgment) {
+      System.out.println("\n\n*******************  onMessage() ---> " + data.value());
+      acknowledgment.acknowledge();
+    }
   
   }*/
 }
