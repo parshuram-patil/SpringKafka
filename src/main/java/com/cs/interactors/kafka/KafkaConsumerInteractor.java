@@ -13,7 +13,7 @@ public class KafkaConsumerInteractor {
   {
     System.out.println("*********** recieveMessage() ---> " + data.value() + " ===> " + acknowledgment.getClass());
     acknowledgment.acknowledge();
-    return null;
+    return data.key();
   }
   
 }

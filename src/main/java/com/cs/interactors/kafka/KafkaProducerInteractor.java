@@ -16,9 +16,20 @@ public class KafkaProducerInteractor {
   @Value("${kafka.topic}")
   private String                topic;
   
-  public String sendMessage(KafkaMessageModel messageModel)
+  @Value("${kafka.raw.topic}")
+  private String                rawTopic;
+  
+  public String sendMessage(KafkaMessageModel messageModel, String type)
   {
     String messageInfo = null;
+    String topic = null;
+    
+    if(type != null && type.startsWith("raw")) {
+      topic = this.rawTopic;
+    }
+    else {
+      topic = this.topic;
+    }
     
     try {
       System.out.println("************** Data Size : " + messageModel.getKey().getBytes().length + messageModel.getValue().getBytes().length);

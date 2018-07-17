@@ -34,7 +34,11 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.config.ContainerProperties;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.cs.interactors.kafka.KafkaMessageListenerInteractor;
 
 @EnableKafka
 @Configuration
@@ -79,11 +83,11 @@ public class KafkaConfiguration {
   @Value("${kafka.topic}")
   private String  topic;
   
-  @Value("${kafka.topic2}")
-  private String  topic2;
+  @Value("${kafka.raw.topic}")
+  private String  rawTopic;
   
-  @Value("${kafka.group.id2}")
-  private String  groupID2;
+  @Value("${kafka.raw.group.id}")
+  private String  rawGroupID;
   
   @Bean
   public ProducerFactory<String, String> producerFactory()
@@ -94,10 +98,8 @@ public class KafkaConfiguration {
     props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
     props.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
     props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferMemory);
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.StringSerializer");
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.StringSerializer");
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
     return new DefaultKafkaProducerFactory<>(props);
   }
   
@@ -131,11 +133,11 @@ public class KafkaConfiguration {
     return props;
   }
   
-  /*@Bean
-  public Map<String, Object> consumerPropertie2s() {
+  @Bean
+  public Map<String, Object> rawConsumerProperties() {
   	Map<String, Object> props = new HashMap<>();
   	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-  	props.put(ConsumerConfig.GROUP_ID_CONFIG, groupID2);
+  	props.put(ConsumerConfig.GROUP_ID_CONFIG, rawGroupID);
   	props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
   	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
   	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -146,7 +148,7 @@ public class KafkaConfiguration {
   	props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
   
   	return props;
-  }*/
+  }
   
   @Bean
   public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory()
@@ -180,24 +182,24 @@ public class KafkaConfiguration {
     return tpte;
   }
   
-  /*@Bean
+  @Bean
   public ConcurrentMessageListenerContainer<String, String> container(
-  		ConsumerFactory<String, String> consumerPropertie2s) {
-  	ContainerProperties containerProperties = new ContainerProperties(new String[] { topic2 });
-  	containerProperties.setMessageListener(new Listener());
+  		ConsumerFactory<String, String> rawConsumerProperties) {
+  	ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
+  	containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
   	containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
-  	ConcurrentMessageListenerContainer<String, String> container = new ConcurrentMessageListenerContainer<>(consumerPropertie2s, containerProperties);
+  	ConcurrentMessageListenerContainer<String, String> container = new ConcurrentMessageListenerContainer<>(rawConsumerProperties, containerProperties);
   	container.setConcurrency(concurrency);
-  	//container.start();
+  	container.start();
   	return container;
-  }*/
+  }
   
-  /*@Bean
+ /* @Bean
   public KafkaMessageListenerContainer<String, String> container(
-  		ConsumerFactory<String, String> consumerFactory) {
-  	ContainerProperties containerProperties = new ContainerProperties(new String[] { topic });
-  	containerProperties.setMessageListener(new Listener());
-  	return new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
+  		ConsumerFactory<String, String> rawConsumerProperties) {
+  	ContainerProperties containerProperties = new ContainerProperties(new String[] { rawGroupID });
+  	containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
+  	return new KafkaMessageListenerContainer<>(rawConsumerProperties, containerProperties);
   }*/
   
   /*@Component
