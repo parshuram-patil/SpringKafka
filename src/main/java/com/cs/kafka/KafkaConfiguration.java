@@ -34,11 +34,16 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.listener.config.ContainerProperties;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import com.cs.interactors.kafka.KafkaJsonMessageListenerInteractor;
 import com.cs.interactors.kafka.KafkaMessageListenerInteractor;
+import com.cs.model.kafka.KafkaMessageModel;
 
 @EnableKafka
 @Configuration
@@ -62,9 +67,6 @@ public class KafkaConfiguration {
   @Value("${kafka.buffer.memory}")
   private Long    bufferMemory;
   
-  @Value("${kafka.group.id}")
-  private String  groupID;
-  
   @Value("${kafka.auto.commit.interval.ms}")
   private Integer autoCommitInterval;
   
@@ -83,11 +85,20 @@ public class KafkaConfiguration {
   @Value("${kafka.topic}")
   private String  topic;
   
+  @Value("${kafka.group.id}")
+  private String  groupID;
+  
   @Value("${kafka.raw.topic}")
   private String  rawTopic;
   
   @Value("${kafka.raw.group.id}")
   private String  rawGroupID;
+  
+  @Value("${kafka.json.topic}")
+  private String  jsonTopic;
+  
+  @Value("${kafka.json.group.id}")
+  private String  jsonGroupID;
   
   @Bean
   public ProducerFactory<String, String> producerFactory()
@@ -104,9 +115,29 @@ public class KafkaConfiguration {
   }
   
   @Bean
+  public ProducerFactory<String, KafkaMessageModel> jsonProducerFactory()
+  {
+    Map<String, Object> props = new HashMap<>();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+    props.put(ProducerConfig.RETRIES_CONFIG, retries);
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
+    props.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferMemory);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+    return new DefaultKafkaProducerFactory<>(props);
+  }
+  
+  @Bean
   public KafkaTemplate<String, String> kafkaTemplate()
   {
     return new KafkaTemplate<>(producerFactory());
+  }
+  
+  @Bean
+  public KafkaTemplate<String, KafkaMessageModel> jsonKafkaTemplate()
+  {
+    return new KafkaTemplate<>(jsonProducerFactory());
   }
   
   @Bean
@@ -119,6 +150,13 @@ public class KafkaConfiguration {
   public ConsumerFactory<String, String> rawConsumerFactory()
   {
     return new DefaultKafkaConsumerFactory<>(rawConsumerProperties());
+  }
+  
+  @Bean
+  public ConsumerFactory<String, KafkaMessageModel> jsonConsumerFactory()
+  {
+    JsonDeserializer<KafkaMessageModel> jsonDeserializer = new JsonDeserializer<>(KafkaMessageModel.class);
+    return new DefaultKafkaConsumerFactory<>(jsonConsumerProperties(), new StringDeserializer(), jsonDeserializer);
   }
   
   @Bean
@@ -147,6 +185,21 @@ public class KafkaConfiguration {
     props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
+    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalMs);
+    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+  
+    return props;
+  }
+  
+  @Bean
+  public Map<String, Object> jsonConsumerProperties() {
+    Map<String, Object> props = new HashMap<>();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, jsonGroupID);
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
     props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
     props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -208,15 +261,15 @@ public class KafkaConfiguration {
     containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
     return new KafkaMessageListenerContainer<>(rawConsumerFactory, containerProperties);
   }
-  
-  /*@Component
-  public static class Listener implements AcknowledgingMessageListener<String, String> {
-  
-    @Override
-    public void onMessage(ConsumerRecord<String, String> data, Acknowledgment acknowledgment) {
-      System.out.println("\n\n*******************  onMessage() ---> " + data.value());
-      acknowledgment.acknowledge();
-    }
-  
-  }*/
+
+  @Bean
+  public ConcurrentMessageListenerContainer<String, KafkaMessageModel> jsonContainer(
+      ConsumerFactory<String, KafkaMessageModel> jsonConsumerFactory) {
+      ContainerProperties containerProperties = new ContainerProperties(new String[] { jsonTopic });
+      containerProperties.setMessageListener(new KafkaJsonMessageListenerInteractor());
+      containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
+      ConcurrentMessageListenerContainer<String, KafkaMessageModel> container = new ConcurrentMessageListenerContainer<>(jsonConsumerFactory, containerProperties);
+      container.setConcurrency(concurrency);
+      return container;
+  }
 }
