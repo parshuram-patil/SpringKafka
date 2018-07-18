@@ -131,24 +131,28 @@ public class KafkaConfiguration {
   @Bean
   public KafkaTemplate<String, String> kafkaTemplate()
   {
+    
     return new KafkaTemplate<>(producerFactory());
   }
   
   @Bean
   public KafkaTemplate<String, KafkaMessageModel> jsonKafkaTemplate()
   {
+    
     return new KafkaTemplate<>(jsonProducerFactory());
   }
   
   @Bean
   public ConsumerFactory<String, String> consumerFactory()
   {
+    
     return new DefaultKafkaConsumerFactory<>(consumerProperties());
   }
   
   @Bean
   public ConsumerFactory<String, String> rawConsumerFactory()
   {
+    
     return new DefaultKafkaConsumerFactory<>(rawConsumerProperties());
   }
   
@@ -156,6 +160,7 @@ public class KafkaConfiguration {
   public ConsumerFactory<String, KafkaMessageModel> jsonConsumerFactory()
   {
     JsonDeserializer<KafkaMessageModel> jsonDeserializer = new JsonDeserializer<>(KafkaMessageModel.class);
+    
     return new DefaultKafkaConsumerFactory<>(jsonConsumerProperties(), new StringDeserializer(), jsonDeserializer);
   }
   
@@ -218,6 +223,7 @@ public class KafkaConfiguration {
     factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
     factory.getContainerProperties().setConsumerTaskExecutor(execC());
     factory.getContainerProperties().setListenerTaskExecutor(execL());
+    
     return factory;
   }
   
@@ -228,6 +234,7 @@ public class KafkaConfiguration {
     tpte.setThreadGroupName("execC Group");
     tpte.setThreadNamePrefix("-execC_Thread-");
     tpte.setCorePoolSize(10);
+    
     return tpte;
   }
   
@@ -238,6 +245,7 @@ public class KafkaConfiguration {
     tpte.setCorePoolSize(10);
     tpte.setThreadGroupName("execL Group");
     tpte.setThreadNamePrefix("-execL_Thread-");
+    
     return tpte;
   }
   
@@ -259,6 +267,7 @@ public class KafkaConfiguration {
     ContainerProperties containerProperties = new ContainerProperties(new String[] { rawTopic });
     containerProperties.setMessageListener(new KafkaMessageListenerInteractor());
     containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
+    
     return new KafkaMessageListenerContainer<>(rawConsumerFactory, containerProperties);
   }
 
@@ -270,6 +279,7 @@ public class KafkaConfiguration {
       containerProperties.setAckMode(AckMode.MANUAL_IMMEDIATE);
       ConcurrentMessageListenerContainer<String, KafkaMessageModel> container = new ConcurrentMessageListenerContainer<>(jsonConsumerFactory, containerProperties);
       container.setConcurrency(concurrency);
+      
       return container;
   }
 }

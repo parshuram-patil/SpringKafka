@@ -10,7 +10,7 @@ import com.cs.interactors.kafka.producer.KafkaJsonProducerInteractor;
 import com.cs.model.kafka.KafkaMessageModel;
 
 @Controller
-public class JsonKafkaProducerController {
+public class KafkaJsonProducerController {
   
   @Autowired
   KafkaJsonProducerInteractor KafkaJsonProducerInteractor;
