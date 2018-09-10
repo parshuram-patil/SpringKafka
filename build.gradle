@@ -15,7 +15,7 @@ repositories {
 
 gretty {
     httpPort = 8091
-    contextPath = '/MySpringKafka'
+    contextPath = '/SpringKafka'
     servletContainer = 'jetty9'
     debugPort = 9797
     debugSuspend = false
