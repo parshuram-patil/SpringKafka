@@ -6,6 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.cs.model.kafka.KafkaMessageModel;
+import com.cs.proto.compile.klassInstance.KlassInstanceProto.KlassInstance;
 
 @Component
 public class KafkaProducerInteractor {
@@ -13,8 +14,14 @@ public class KafkaProducerInteractor {
   @Autowired
   KafkaTemplate<String, String> kafkaTemplate;
   
+  @Autowired
+  KafkaTemplate<String, KlassInstance> kafkaTemplateForKlassInstance;
+  
   @Value("${kafka.topic}")
   private String                topic;
+  
+  @Value("${kafka.proto.topic}")
+  private String                protoTopic;
   
   public String sendMessage(KafkaMessageModel messageModel)
   {
@@ -29,6 +36,25 @@ public class KafkaProducerInteractor {
       messageInfo = "Message Cannot Sent";
       // e.printStackTrace();
     }
+    
+    return messageInfo;
+  }
+  
+  public String sendMessage(KlassInstance messageModel)
+  {
+    String messageInfo = null;
+    
+    try {
+      System.out.println("************** " + messageModel.getId() + " Data Size : " + messageModel.getSerializedSize());
+      kafkaTemplateForKlassInstance.send(protoTopic, messageModel.getId(), messageModel).get();
+      messageInfo = "Message Sent Successfully";
+    }
+    catch (Exception e) {
+      messageInfo = "Message Cannot Sent";
+      // e.printStackTrace();
+    }
+    
+    System.out.println(messageInfo);
     
     return messageInfo;
   }

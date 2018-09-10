@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.cs.kafka;
+package com.cs.kafka.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +35,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.cs.kafka.serialiser.KlassInstanceSerielizer;
+import com.cs.proto.compile.klassInstance.KlassInstanceProto.KlassInstance;
 
 @EnableKafka
 @Configuration
@@ -85,6 +88,9 @@ public class KafkaConfiguration {
   @Value("${kafka.group.id2}")
   private String  groupID2;
   
+  @Value("${kafka.proto.group.id}")
+  private String  protoGroup;
+  
   @Bean
   public ProducerFactory<String, String> producerFactory()
   {
@@ -102,15 +108,43 @@ public class KafkaConfiguration {
   }
   
   @Bean
+  public ProducerFactory<String, KlassInstance> producerFactoryForKlassInstance()
+  {
+    Map<String, Object> props = new HashMap<>();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+    props.put(ProducerConfig.RETRIES_CONFIG, retries);
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
+    props.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferMemory);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+        "org.apache.kafka.common.serialization.StringSerializer");
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+    		KlassInstanceSerielizer.class);
+    return new DefaultKafkaProducerFactory<>(props);
+  }
+  
+  @Bean
   public KafkaTemplate<String, String> kafkaTemplate()
   {
     return new KafkaTemplate<>(producerFactory());
   }
   
   @Bean
+  public KafkaTemplate<String, KlassInstance> kafkaTemplateForKlassInstance()
+  {
+    return new KafkaTemplate<>(producerFactoryForKlassInstance());
+  }
+  
+  @Bean
   public ConsumerFactory<String, String> consumerFactory()
   {
     return new DefaultKafkaConsumerFactory<>(consumerProperties());
+  }
+  
+  @Bean
+  public ConsumerFactory<String, KlassInstance> consumerFactoryForKlassInstance()
+  {
+    return new DefaultKafkaConsumerFactory<>(consumerPropertiesForKlassInstance());
   }
   
   @Bean
@@ -131,14 +165,14 @@ public class KafkaConfiguration {
     return props;
   }
   
-  /*@Bean
-  public Map<String, Object> consumerPropertie2s() {
+  @Bean
+  public Map<String, Object> consumerPropertiesForKlassInstance() {
   	Map<String, Object> props = new HashMap<>();
   	props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-  	props.put(ConsumerConfig.GROUP_ID_CONFIG, groupID2);
+  	props.put(ConsumerConfig.GROUP_ID_CONFIG, protoGroup);
   	props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
   	props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-  	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+  	props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KlassInstanceSerielizer.class);
   	props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
   	props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
   	props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -146,7 +180,7 @@ public class KafkaConfiguration {
   	props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
   
   	return props;
-  }*/
+  }
   
   @Bean
   public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory()
@@ -157,6 +191,16 @@ public class KafkaConfiguration {
     factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
     factory.getContainerProperties().setConsumerTaskExecutor(execC());
     factory.getContainerProperties().setListenerTaskExecutor(execL());
+    return factory;
+  }
+  
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, KlassInstance> kafkaListenerContainerFactoryForKlassInstance()
+  {
+    ConcurrentKafkaListenerContainerFactory<String, KlassInstance> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(consumerFactoryForKlassInstance());
+    factory.setConcurrency(concurrency);
+    factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
     return factory;
   }
   
