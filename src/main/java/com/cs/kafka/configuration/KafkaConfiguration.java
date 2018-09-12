@@ -190,7 +190,7 @@ public class KafkaConfiguration {
     factory.setConcurrency(concurrency);
     factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
     factory.getContainerProperties().setConsumerTaskExecutor(execC());
-    factory.getContainerProperties().setListenerTaskExecutor(execL());
+    factory.getContainerProperties().setConsumerTaskExecutor(execL());
     return factory;
   }
   
