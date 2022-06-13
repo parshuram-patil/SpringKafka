@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc
     http://www.springframework.org/schema/mvc/spring-mvc.xsd
     http://www.springframework.org/schema/beans 
     http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -11,53 +11,53 @@
     http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-	<mvc:annotation-driven />
+    <mvc:annotation-driven/>
 
-	<!-- <mvc:resources mapping="/**" location="/gui/" /> -->
+    <!-- <mvc:resources mapping="/**" location="/gui/" /> -->
 
-	<!-- scanning all the controllers -->
-	<context:component-scan
-		base-package="com.cs.controller" />
-	
-	<!-- <mvc:interceptors>
-		<mvc:interceptor>
-			<mvc:mapping path="/**" />
-			<bean class="com.cs.interceptors.LoginInterceptor" />
-		</mvc:interceptor>
-	</mvc:interceptors> -->
-	
-	<!-- <mvc:interceptors>
-    	<mvc:interceptor>
-        	<mvc:mapping path="/**"/>
-        	<mvc:exclude-mapping path="/getlogin"/>
-        	<mvc:exclude-mapping path="/app/html/login-start.html"/>
-        	<mvc:exclude-mapping path="/app/html/**"/>
-        	<mvc:exclude-mapping path="/appbuild/**"/>
-        	<mvc:exclude-mapping path="/app/libraries/**"/>
-        	<mvc:exclude-mapping path="/app/themes/**"/>
-        	<mvc:exclude-mapping path="/shopLogin"/>
-        	<mvc:exclude-mapping path="/shopLogin2"/>
-        	<mvc:exclude-mapping path="/runtime/qualitysummary"/>
-        	<mvc:exclude-mapping path="/runtime/groupsummary/**"/>
-        	<mvc:exclude-mapping path="/runtime/dashboardsummary/**"/>
-        	<mvc:exclude-mapping path="/runtime/statictranslations/get"/>
-        	<mvc:exclude-mapping path="/config/defaultandsupportedlang"/>
-        	<bean class="com.cs.base.controller.interceptor.LoginInterceptor" />
-    	</mvc:interceptor>
-    	<bean class="com.cs.base.controller.interceptor.RequestInterceptor" />
-	</mvc:interceptors>  -->
-	
-	<!-- <mvc:annotation-driven>
-		<mvc:message-converters>
-			<bean
-				class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-			</bean>
-		</mvc:message-converters>
-	</mvc:annotation-driven> -->
+    <!-- scanning all the controllers -->
+    <context:component-scan
+            base-package="com.cs.controller"/>
 
-	<!-- <bean id="multipartResolver"
-		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<property name="maxUploadSize" value="100000000000000" />
-	</bean> -->
+    <!-- <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <bean class="com.cs.interceptors.LoginInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors> -->
+
+    <!-- <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/getlogin"/>
+            <mvc:exclude-mapping path="/app/html/login-start.html"/>
+            <mvc:exclude-mapping path="/app/html/**"/>
+            <mvc:exclude-mapping path="/appbuild/**"/>
+            <mvc:exclude-mapping path="/app/libraries/**"/>
+            <mvc:exclude-mapping path="/app/themes/**"/>
+            <mvc:exclude-mapping path="/shopLogin"/>
+            <mvc:exclude-mapping path="/shopLogin2"/>
+            <mvc:exclude-mapping path="/runtime/qualitysummary"/>
+            <mvc:exclude-mapping path="/runtime/groupsummary/**"/>
+            <mvc:exclude-mapping path="/runtime/dashboardsummary/**"/>
+            <mvc:exclude-mapping path="/runtime/statictranslations/get"/>
+            <mvc:exclude-mapping path="/config/defaultandsupportedlang"/>
+            <bean class="com.cs.base.controller.interceptor.LoginInterceptor" />
+        </mvc:interceptor>
+        <bean class="com.cs.base.controller.interceptor.RequestInterceptor" />
+    </mvc:interceptors>  -->
+
+    <!-- <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean
+                class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven> -->
+
+    <!-- <bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="100000000000000" />
+    </bean> -->
 
 </beans>
